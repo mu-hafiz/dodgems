@@ -18,6 +18,7 @@ from tkinter import Tk, Frame, Button as Btn, Label, PhotoImage as Image, \
 from time import sleep
 from random import randint
 import ctypes
+from pygame import mixer
 
 # Fixes DPI issue that caused window dimensions to be off
 ctypes.windll.shcore.SetProcessDpiAwareness(2)
@@ -1372,13 +1373,16 @@ def createBall(move):
 
 def moveBalls():
     '''Responsible for checking collisions with the wall, between balls and the player, and moving each ball.'''
+    wallHitThisFrame = False
     for i in range(len(balls)):
         pos = gameFrame.coords(balls[i])
         # Check the ball for collision with wall
         if pos[3] > 1080 or pos[1] < 0:
             ySpeed[i] = -ySpeed[i]
+            wallHitThisFrame = True
         if pos[2] > 1920 or pos[0] < 0:
             xSpeed[i] = -xSpeed[i]
+            wallHitThisFrame = True
 
         # Check the ball for collision with other balls
         for j in range(len(balls)):
@@ -1392,6 +1396,9 @@ def moveBalls():
                 xSpeed[j] = -xSpeed[j]
 
         gameFrame.move(balls[i], xSpeed[i], ySpeed[i])
+
+        if wallHitThisFrame:
+            bounceSound.play()
 
 
 # ---------------------------------------------- PLAYER FUNCTIONS ----------------------------------------------------
@@ -1785,10 +1792,18 @@ def loadGame():
         initialiseGame(True)
 
 
+# ---------------------------------------------- SOUND FUNCTIONS --------------------------------------------------------
+
+def initialiseSounds():
+    global bounceSound
+    bounceSound = mixer.Sound("Bounce.wav")
+
 # ---------------------------------------------- MAIN PROGRAM --------------------------------------------------------
 configureWindow()
 initialiseMenu()
 changeBackground(bgColour)
 initialiseKeybinds()
 homeFrame.pack(fill="both", expand=True)  # Start at the home page
+mixer.init()
+initialiseSounds()
 window.mainloop()
