@@ -627,6 +627,8 @@ def addToLeaderboard(event=None):
             entry[0] = str(count )  # Update the rank by one
             leaderboard.insert("", "end", iid=numOfEntries,
                                values=(entry))
+            
+        saveLeaderboard()
 
 
 def saveLeaderboard():
